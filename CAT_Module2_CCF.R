@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
 # Cross-correlation Actin Toca: MODULE 2: CCF computation
-
 #-------------------------------------------------------------------------------
 # Useful functions:
 
@@ -37,18 +36,20 @@ MovingAverage <- function(x, w = 5) {
   filter(x, rep(1/w, w), sides = 2)
 }
 #-------------------------------------------------------------------------------
-# Let's add some comments
+# Compute the CCF table:
 
-n.slices 
+# maximal lag (in timepoints) for the CCF function:
 max.lag = 10
 
 all.lag = (-max.lag:max.lag); all.lag
 
+# Create an empty data frame of correct dimensions
 ccf.toca.actin <- data.frame(matrix(NA, ncol = ncol(w.actin), nrow = 2*max.lag + 1))
 ccf.toca.actin.bg <- data.frame(matrix(NA, ncol = ncol(w.actin.bg), nrow = 2*max.lag + 1))
 row.names(ccf.toca.actin) <- all.lag
 row.names(ccf.toca.actin.bg) <- all.lag
 
+# Compute CCF per column, populate the CCf table
 for(i in 1:n.spots) {
   ccf.i  <- ccf(w.toca[, i], w.actin[, i], lag.max = max.lag, na.action = na.pass, plot = FALSE) 
   ccf.i.bg <- ccf(w.toca.bg[, i], w.actin.bg[, i], lag.max = max.lag, na.action = na.pass, plot = FALSE)
@@ -60,6 +61,7 @@ for(i in 1:n.spots) {
 ccf.toca.actin
 ccf.toca.actin.bg
 
+# Compute means & CI:
 mean.ccf.toca.actin <- apply(ccf.toca.actin, 1, mean)
 mean.ccf.toca.actin.bg <- apply(ccf.toca.actin.bg, 1, mean)
 
@@ -68,7 +70,11 @@ ci.ccf.toca.actin.bg  <- apply(ccf.toca.actin.bg, 1, CI)
 #ci1 <- mean.ccf.toca.actin + ci.ccf.toca.actin
 #ci2 <- mean.ccf.toca.actin - ci.ccf.toca.actin
 
-graphics.off()
+# switch off any other active graphs
+# graphics.off()
+
+#-------------------------------------------------------------------------------
+# Plot the CCF per structure, and mean CCF for all structures:
 
 matplot(all.lag, ccf.toca.actin, type = "l", lty = 1, 
         col = "#88888850", 
@@ -88,8 +94,7 @@ text(-10, 0.75, pos = 4, "CCF (mean)", col = "red")
 text(-10, -0.55, pos = 4, "Toca -> actin")
 text(10, -0.55, pos = 2, "actin -> Toca")
 
-
-#  --- repeat plotting with bg-corrected data:
+#  --- repeat with bg-corrected data:
 
 matplot(all.lag, ccf.toca.actin.bg, type = "l", lty = 1, 
         col = "#88888850", 
@@ -109,25 +114,3 @@ text(-10, 0.75, pos = 4, "CCF (mean)", col = "red")
 text(-10, -0.55, pos = 4, "Toca -> actin")
 text(10, -0.55, pos = 2, "actin -> Toca")
 
-
-# 
-# 
-# # ---------------------------------------------------------------------------
-# # 6. Calculate CCFs from tip F and tip movement tables
-# 
-# maxlag = 20
-# lag.range <- -maxlag:maxlag
-# lag.in.s  <- lag.range * spt
-# 
-# ccf.tip.dctm <- data.frame(matrix(NA, ncol = ncol(all.move), nrow = 2*maxlag + 1))
-# all.filo  <- seq_along(colnames(all.move))
-# 
-# 
-# for (i in all.filo) {
-#   ccf.i  <- ccf(tip.f[, i], all.move[, i], lag.max = 20, na.action = na.pass, plot = FALSE) 
-#   ccf.tip.dctm[, i] <- ccf.i
-#   rm(ccf.i, ccf.z.i)
-# }
-# 
-# colnames(ccf.tip.dctm) <- colnames(all.move)
-# row.names(ccf.tip.dctm)  <- lag.in.s

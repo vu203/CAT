@@ -37,6 +37,7 @@ MovingAverage <- function(x, w = 5) {
   filter(x, rep(1/w, w), sides = 2)
 }
 #-------------------------------------------------------------------------------
+# Let's add some comments
 
 n.slices 
 max.lag = 10
